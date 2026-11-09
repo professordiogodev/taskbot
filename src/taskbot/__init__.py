@@ -1,0 +1,1 @@
+"""taskbot: CLI de tarefas."""

@@ -1,0 +1,23 @@
+[project]
+name = "taskbot"
+version = "0.1.0"
+description = "CLI de tarefas"
+requires-python = ">=3.10"
+dependencies = ["typer>=0.12"]
+
+[project.scripts]
+taskbot = "taskbot.cli:app"
+
+[dependency-groups]
+dev = ["pytest", "ruff"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/taskbot"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
