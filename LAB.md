@@ -1,185 +1,185 @@
-# LAB — Constrói o `taskbot` com um agente de código
+# LAB — Build `taskbot` with a coding agent
 
-**Tempo:** 45-60 min · **Nível:** iniciante · **Aula 1 — trabalho de casa**
+**Time:** 45-60 min · **Level:** beginner · **Class 1 — homework**
 
-Vais construir uma pequena CLI de tarefas (`taskbot add`, `list`, `done`, `rm`) **com a ajuda de um agente de código**, seguindo o fluxo profissional:
+You will build a small task CLI (`taskbot add`, `list`, `done`, `rm`) **with the help of a coding agent**, following the professional workflow:
 
 ```
-Explorar → Planear → Implementar → Verificar → Commit
+Explore → Plan → Implement → Verify → Commit
 ```
 
-Este projeto continua nas aulas 2 a 7 (guard-rails, MCP/RAG, CI, modelos abertos, fine-tuning, segurança). **Guarda-o bem.**
+This project continues in classes 2 to 7 (guardrails, MCP/RAG, CI, open models, fine-tuning, security). **Keep it safe.**
 
-> **Legenda**
-> 🟠 = Claude Code · 🟣 = OpenCode (usa só um)
-> 💻 = escreve no **terminal** · 💬 = escreve **dentro do agente**
-> ✅ = como saber que correu bem · 🆘 = se algo correr mal
+> **Legend**
+> 🟠 = Claude Code · 🟣 = OpenCode (use only one)
+> 💻 = type in the **terminal** · 💬 = type **inside the agent**
+> ✅ = how to tell it went well · 🆘 = if something goes wrong
 
 ---
 
-## Antes de começar
+## Before you start
 
-Precisas de: `git`, `python3` (3.10+), `node` (20+), `uv`, e um agente (🟠 Claude Code ou 🟣 OpenCode) já ligado a um modelo.
+You need: `git`, `python3` (3.10+), `node` (20+), `uv`, and an agent (🟠 Claude Code or 🟣 OpenCode) already connected to a model.
 
 ```bash
 git --version && python3 --version && node --version && uv --version
 ```
-✅ Os quatro mostram uma versão.
+✅ All four print a version.
 
-Faltam coisas? Segue o `passo-a-passo.md` da aula 1 (Parte 0), ou:
-- `uv`: `curl -LsSf https://astral.sh/uv/install.sh | sh` (depois reabre o terminal)
+Missing something? Follow the class 1 `passo-a-passo.md` (Part 0), or:
+- `uv`: `curl -LsSf https://astral.sh/uv/install.sh | sh` (then reopen the terminal)
 - 🟠 `npm install -g @anthropic-ai/claude-code`
-- 🟣 `curl -fsSL https://opencode.ai/install | bash` e dentro dele `/connect` + `/models`
+- 🟣 `curl -fsSL https://opencode.ai/install | bash` and inside it `/connect` + `/models`
 
-Primeira vez com git? `git config --global user.name "O Teu Nome"` e `git config --global user.email "o.teu@email.com"`.
+First time with git? `git config --global user.name "Your Name"` and `git config --global user.email "your@email.com"`.
 
-> ⚠️ **Modelo gratuito?** Pode recolher dados. Neste lab não há nada confidencial, mas nunca uses código do trabalho.
+> ⚠️ **Free model?** It may collect data. Nothing in this lab is confidential, but never use work code.
 
 ---
 
-## Passo 1 — Preparar o projeto (5 min)
+## Step 1 — Set up the project (5 min)
 
-### 1.1 Clonar este repo
+### 1.1 Clone this repo
 ```bash
 git clone https://github.com/professordiogodev/taskbot.git
 cd taskbot
-git switch -c meu-taskbot
+git switch -c my-taskbot
 ```
 
-### 1.2 Inicializar o projeto Python
+### 1.2 Initialize the Python project
 ```bash
 uv init --package --name taskbot
 uv add typer
 uv add --dev pytest ruff
 ```
 
-✅ Agora existem `pyproject.toml` e `src/taskbot/`. Confirma:
+✅ Now `pyproject.toml` and `src/taskbot/` exist. Check:
 ```bash
 ls
 ls src/taskbot
 ```
 
-### 1.3 Primeiro commit
+### 1.3 First commit
 ```bash
 git add -A
 git commit -m "chore: bootstrap"
 git status
 ```
-✅ `git status` diz *"nothing to commit, working tree clean"*.
+✅ `git status` says *"nothing to commit, working tree clean"*.
 
-🆘 `uv init` diz que já existe um projeto? Estás na pasta certa? (`pwd` deve acabar em `taskbot`.)
+🆘 `uv init` says a project already exists? Are you in the right folder? (`pwd` should end in `taskbot`.)
 
-> 💡 **Regra do curso:** começa sempre cada tarefa com o git limpo. Se o agente fizer asneira, `git restore .` repõe tudo.
+> 💡 **Course rule:** always start each task with a clean git tree. If the agent makes a mess, `git restore .` puts everything back.
 
 ---
 
-## Passo 2 — Dar contexto ao agente (10 min)
+## Step 2 — Give the agent context (10 min)
 
-### 2.1 Abrir o agente na pasta do projeto
+### 2.1 Open the agent in the project folder
 🟠 💻 `claude` · 🟣 💻 `opencode`
 
-### 2.2 Gerar o rascunho do ficheiro de contexto
+### 2.2 Generate the draft context file
 💬 `/init`
 
-- 🟠 cria `CLAUDE.md` · 🟣 cria `AGENTS.md`
-- Aceita as autorizações que pedir (lê o que pede!).
+- 🟠 creates `CLAUDE.md` · 🟣 creates `AGENTS.md`
+- Accept the permissions it asks for (read what it asks!).
 
-### 2.3 Cortar o ficheiro para ~25 linhas
-Abre-o no editor. O rascunho vem quase sempre comprido de mais. Deixa **só**:
+### 2.3 Trim the file to ~25 lines
+Open it in your editor. The draft is almost always too long. Keep **only**:
 
 ```markdown
 # taskbot
-CLI de tarefas em Python 3.10+. Gestor de pacotes: uv. CLI com Typer.
+Task CLI in Python 3.10+. Package manager: uv. CLI with Typer.
 
-## Comandos
-- Testes: `uv run pytest -q`
-- Lint e formatação: `uv run ruff check . && uv run ruff format .`
-- Correr a CLI: `uv run taskbot --help`
+## Commands
+- Tests: `uv run pytest -q`
+- Lint and format: `uv run ruff check . && uv run ruff format .`
+- Run the CLI: `uv run taskbot --help`
 
-## Arquitetura
-- `src/taskbot/models.py` — dataclass Task
-- `src/taskbot/store.py` — persistência em JSON (variável TASKBOT_FILE)
-- `src/taskbot/cli.py` — comandos Typer
+## Architecture
+- `src/taskbot/models.py` — Task dataclass
+- `src/taskbot/store.py` — JSON persistence (TASKBOT_FILE variable)
+- `src/taskbot/cli.py` — Typer commands
 
-## Regras
-- Funções públicas com type hints e um teste em `tests/`.
-- Não adicionar dependências sem perguntar.
-- Nunca alterar testes existentes para os fazer passar.
+## Rules
+- Public functions with type hints and a test in `tests/`.
+- Do not add dependencies without asking.
+- Never change existing tests to make them pass.
 ```
 
-> 🧠 Para cada linha pergunta: *"Se eu apagar isto, o agente erra?"* Se não, apaga.
+> 🧠 For each line ask: *"If I delete this, will the agent get it wrong?"* If not, delete it.
 
-### 2.4 Confirmar que os comandos são verdadeiros
+### 2.4 Confirm the commands are true
 ```bash
 uv run ruff check .
 uv run pytest -q
 ```
-(`pytest` pode dizer "no tests ran": é normal por agora.)
+(`pytest` may say "no tests ran": that's normal for now.)
 
-### 2.5 Guardar
+### 2.5 Save
 ```bash
 git add -A
 git commit -m "docs: add context file"
 ```
 
-✅ **Checkpoint 2:** ficheiro de contexto com ≤ 40 linhas e commit feito.
+✅ **Checkpoint 2:** context file with ≤ 40 lines and commit done.
 
 ---
 
-## Passo 3 — Planear antes de programar (10 min)
+## Step 3 — Plan before coding (10 min)
 
-### 3.1 Entrar no plan mode
-O agente só **lê e propõe**, não edita.
-- 🟠 `Shift + Tab` até aparecer **plan mode**
-- 🟣 `Tab` até o agente ativo ser **Plan**
+### 3.1 Enter plan mode
+The agent only **reads and proposes**, it does not edit.
+- 🟠 `Shift + Tab` until **plan mode** appears
+- 🟣 `Tab` until the active agent is **Plan**
 
-### 3.2 Pedir o plano
+### 3.2 Ask for the plan
 💬
 ```
-Quero uma CLI de tarefas chamada taskbot com os comandos:
-  add "texto"   → cria tarefa
-  list          → lista tarefas (id e estado)
-  done <id>     → marca como concluída
-  rm <id>       → remove
-Persistência num ficheiro JSON (caminho por variável de ambiente TASKBOT_FILE,
-default ~/.taskbot.json). Usa Typer.
-Faz-me as perguntas que precisares e depois propõe um plano:
-ficheiros, funções, testes, riscos. Não escrevas código.
+I want a task CLI called taskbot with the commands:
+  add "text"   → creates a task
+  list         → lists tasks (id and status)
+  done <id>    → marks as completed
+  rm <id>      → removes
+Persistence in a JSON file (path via the TASKBOT_FILE environment variable,
+default ~/.taskbot.json). Use Typer.
+Ask me whatever questions you need and then propose a plan:
+files, functions, tests, risks. Do not write code.
 ```
 
-### 3.3 Responder às perguntas e ler o plano todo
-### 3.4 Acrescentar **uma correção tua**
-Por exemplo:
+### 3.3 Answer the questions and read the whole plan
+### 3.4 Add **one correction of your own**
+For example:
 💬
 ```
-Acrescenta ao plano: os ids são incrementais e nunca são reutilizados, mesmo depois de um rm.
-O store tem de ser testável sem tocar no ficheiro real do utilizador.
+Add to the plan: ids are incremental and are never reused, even after an rm.
+The store must be testable without touching the user's real file.
 ```
 
-✅ **Checkpoint 3:** o plano menciona `TASKBOT_FILE`, testes, e a tua correção.
+✅ **Checkpoint 3:** the plan mentions `TASKBOT_FILE`, tests, and your correction.
 
-> 💡 Corrigir um plano demora 20 segundos. Corrigir 200 linhas erradas demora 20 minutos.
+> 💡 Fixing a plan takes 20 seconds. Fixing 200 wrong lines takes 20 minutes.
 
 ---
 
-## Passo 4 — Implementar e verificar, por passos (20 min)
+## Step 4 — Implement and verify, step by step (20 min)
 
-Sai do plan mode (🟠 `Shift+Tab` · 🟣 `Tab` → **Build**). Faz **um passo de cada vez** e um commit por passo.
+Leave plan mode (🟠 `Shift+Tab` · 🟣 `Tab` → **Build**). Do **one step at a time** and one commit per step.
 
-### 4.1 Modelo e store
+### 4.1 Model and store
 💬
 ```
-Implementa models.py e store.py (com testes do store em tests/test_store.py). Corre os testes.
+Implement models.py and store.py (with store tests in tests/test_store.py). Run the tests.
 ```
-Verifica **tu**:
+Check **yourself**:
 ```bash
 git diff
 uv run pytest -q
 uv run ruff check .
 ```
-Perguntas ao ler o `git diff`:
-- Os testes testam mesmo o que importa (ids nunca reutilizados, ficheiro inexistente)?
-- Algum teste toca no ficheiro real `~/.taskbot.json`? (Não devia.)
+Questions to ask while reading the `git diff`:
+- Do the tests really test what matters (ids never reused, missing file)?
+- Does any test touch the real `~/.taskbot.json` file? (It shouldn't.)
 
 ```bash
 git add -A
@@ -189,9 +189,9 @@ git commit -m "feat: task store"
 ### 4.2 CLI
 💬
 ```
-Implementa a CLI em cli.py com os comandos add, list, done e rm, e testes com typer.testing.CliRunner. Corre os testes e o ruff.
+Implement the CLI in cli.py with the commands add, list, done and rm, and tests using typer.testing.CliRunner. Run the tests and ruff.
 ```
-Verifica:
+Check:
 ```bash
 git diff
 uv run pytest -q
@@ -200,50 +200,50 @@ git add -A
 git commit -m "feat: cli"
 ```
 
-### 4.3 Experimentar à mão
+### 4.3 Try it by hand
 ```bash
 export TASKBOT_FILE=/tmp/taskbot-test.json
-uv run taskbot add "estudar agentes"
-uv run taskbot add "ler o AGENTS.md"
+uv run taskbot add "study agents"
+uv run taskbot add "read AGENTS.md"
 uv run taskbot list
 uv run taskbot done 1
 uv run taskbot list
 uv run taskbot rm 2
 uv run taskbot list
 ```
-✅ **Checkpoint 4:** as tarefas aparecem, ficam concluídas e são removidas; testes verdes; ≥ 2 commits novos.
+✅ **Checkpoint 4:** tasks show up, get completed, and are removed; tests green; ≥ 2 new commits.
 
-🆘 O comando `taskbot` não existe? 💬 `O entry point taskbot não funciona. Corrige o pyproject.toml e mostra-me o que mudaste.`
-🆘 O agente "corrigiu" alterando testes? `git restore .` e repete, acrescentando *"não alteres os testes existentes"*.
+🆘 The `taskbot` command doesn't exist? 💬 `The taskbot entry point doesn't work. Fix pyproject.toml and show me what you changed.`
+🆘 The agent "fixed" things by changing tests? `git restore .` and repeat, adding *"do not change existing tests"*.
 
 ---
 
-## Passo 5 — Uma feature com o fluxo completo: prioridades (10 min)
+## Step 5 — A feature with the full workflow: priorities (10 min)
 
-### 5.1 Conversa nova
-🟠 `/clear` · 🟣 `/new`  (mudaste de tarefa → conversa nova). Confirma `git status` limpo.
+### 5.1 New conversation
+🟠 `/clear` · 🟣 `/new`  (you changed task → new conversation). Confirm `git status` is clean.
 
-### 5.2 Plan mode e pedido
+### 5.2 Plan mode and request
 💬
 ```
-Adiciona o campo priority (low/med/high, default med) às tarefas.
-`add` ganha a opção --priority/-p. `list` ordena por prioridade (high primeiro) e mostra-a.
-Ficheiros JSON antigos sem priority têm de continuar a funcionar (assumir med).
-Escreve primeiro os testes que falham, depois implementa.
-Verifica com pytest e ruff.
+Add a priority field (low/med/high, default med) to tasks.
+`add` gets an --priority/-p option. `list` sorts by priority (high first) and shows it.
+Old JSON files without priority must keep working (assume med).
+Write the failing tests first, then implement.
+Verify with pytest and ruff.
 ```
 
-### 5.3 Aprovar o plano, implementar, ler o diff
+### 5.3 Approve the plan, implement, read the diff
 ```bash
 git diff
 uv run pytest -q
 uv run ruff check .
 ```
 
-### 5.4 O ponto que um pedido vago esqueceria
-Existe **um teste para ficheiros JSON antigos** (sem `priority`)? Se não, 💬:
+### 5.4 The point a vague request would forget
+Is there **a test for old JSON files** (without `priority`)? If not, 💬:
 ```
-Acrescenta um teste para um ficheiro JSON antigo sem o campo priority.
+Add a test for an old JSON file without the priority field.
 ```
 
 ```bash
@@ -251,15 +251,15 @@ git add -A
 git commit -m "feat: task priorities"
 ```
 
-✅ **Checkpoint 5:** existe teste de retrocompatibilidade e passa.
+✅ **Checkpoint 5:** a backward-compatibility test exists and passes.
 
 ---
 
-## Passo 6 — Afinar o contexto (5 min)
+## Step 6 — Fine-tune the context (5 min)
 
-Houve algum erro que o agente repetiu (comando errado, convenção ignorada)?
-1. Acrescenta **uma regra concreta** ao ficheiro de contexto.
-2. Remove **uma linha** inútil.
+Was there a mistake the agent repeated (wrong command, ignored convention)?
+1. Add **one concrete rule** to the context file.
+2. Remove **one useless line**.
 3. Commit:
 ```bash
 git add -A
@@ -268,57 +268,57 @@ git commit -m "docs: refine context file"
 
 ---
 
-## Passo 7 — Publicar no TEU GitHub (5 min)
+## Step 7 — Publish to YOUR GitHub (5 min)
 
-Vais precisar disto na **aula 3** (CI no GitHub).
+You will need this in **class 3** (CI on GitHub).
 
 ```bash
-gh auth login          # só se ainda não fizeste
-gh repo create taskbot --private --source . --remote meu --push
+gh auth login          # only if you haven't yet
+gh repo create taskbot --private --source . --remote mine --push
 ```
-✅ O comando imprime o URL do teu repo.
+✅ The command prints your repo's URL.
 
-(Sem `gh`? Cria um repo vazio no site do GitHub e faz `git remote add meu <url>` e `git push -u meu meu-taskbot`.)
-
----
-
-## ✅ Entregável
-
-- [ ] Ficheiro de contexto (`CLAUDE.md`/`AGENTS.md`) com ≤ 40 linhas
-- [ ] ≥ 5 commits em `git log --oneline`
-- [ ] `uv run pytest -q` e `uv run ruff check .` a passar
-- [ ] Teste de retrocompatibilidade (prioridades)
-- [ ] Repo publicado no teu GitHub
+(No `gh`? Create an empty repo on the GitHub website and run `git remote add mine <url>` and `git push -u mine my-taskbot`.)
 
 ---
 
-## 🧗 Desafios extra
+## ✅ Deliverable
 
-1. **Comparação:** repete o Passo 5 **sem plan mode** e com um pedido vago ("adiciona prioridades") numa branch à parte (`git switch -c vago`). Compara os dois diffs: o que ficou de fora?
-2. **Permissões:** pré-aprova `pytest` e `git diff` para deixares de ser interrompido (🟠 `/permissions` · 🟣 `opencode.json`).
-3. **Contexto:** mede os tokens antes e depois de pedires *"lê todo o projeto"*.
-4. **Outro agente:** abre o mesmo repo com o outro agente. Aproveita o ficheiro de contexto?
-5. **Comando novo:** `taskbot clear-done` (remove todas as concluídas), com o fluxo completo.
+- [ ] Context file (`CLAUDE.md`/`AGENTS.md`) with ≤ 40 lines
+- [ ] ≥ 5 commits in `git log --oneline`
+- [ ] `uv run pytest -q` and `uv run ruff check .` passing
+- [ ] Backward-compatibility test (priorities)
+- [ ] Repo published on your GitHub
 
 ---
 
-## 🆘 Problemas frequentes
+## 🧗 Extra challenges
 
-| Sintoma | O que fazer |
+1. **Comparison:** repeat Step 5 **without plan mode** and with a vague request ("add priorities") on a separate branch (`git switch -c vague`). Compare the two diffs: what was left out?
+2. **Permissions:** pre-approve `pytest` and `git diff` so you stop being interrupted (🟠 `/permissions` · 🟣 `opencode.json`).
+3. **Context:** measure the tokens before and after asking *"read the whole project"*.
+4. **Another agent:** open the same repo with the other agent. Does it use the context file?
+5. **New command:** `taskbot clear-done` (removes all completed tasks), with the full workflow.
+
+---
+
+## 🆘 Common problems
+
+| Symptom | What to do |
 |---|---|
-| `command not found: uv/claude/opencode` | Fecha e reabre o terminal; repete a instalação |
-| `git commit` pede nome e email | `git config --global user.name ...` e `user.email ...` |
-| `uv run pytest` não encontra o pacote | `uv sync`; confirma `pyproject.toml` |
-| O agente ignora o ficheiro de contexto | Abre o agente na raiz do projeto; corta o ficheiro |
-| Agente em loop a corrigir o mesmo erro | Conversa nova com o erro exato |
-| Diff enorme e confuso | `git restore .` e divide o pedido em passos |
-| Modelo gratuito esgotou a quota | Outro modelo (🟣 `/models`) ou espera |
-| O agente fez asneira | `git restore .` (e `git clean -fd` para ficheiros novos) · 🟣 `/undo` |
+| `command not found: uv/claude/opencode` | Close and reopen the terminal; repeat the installation |
+| `git commit` asks for name and email | `git config --global user.name ...` and `user.email ...` |
+| `uv run pytest` can't find the package | `uv sync`; check `pyproject.toml` |
+| The agent ignores the context file | Open the agent at the project root; trim the file |
+| Agent looping on the same error | New conversation with the exact error |
+| Huge, confusing diff | `git restore .` and split the request into steps |
+| Free model ran out of quota | Another model (🟣 `/models`) or wait |
+| The agent made a mess | `git restore .` (and `git clean -fd` for new files) · 🟣 `/undo` |
 
 ---
 
-## Reflexão final (2 min)
+## Final reflection (2 min)
 
-- Que parte do fluxo te poupou mais tempo?
-- Onde o agente "inventou" algo que não pedias?
-- O que vais mudar no teu ficheiro de contexto?
+- Which part of the workflow saved you the most time?
+- Where did the agent "invent" something you didn't ask for?
+- What will you change in your context file?

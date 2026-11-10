@@ -1,16 +1,16 @@
 # taskbot
-CLI de tarefas em Python 3.10+, com Typer.
+Task CLI in Python 3.10+, with Typer.
 
-## Comandos
-- Testes: `.venv/bin/python -m pytest -q`
+## Commands
+- Tests: `.venv/bin/python -m pytest -q`
 - Lint/format: `.venv/bin/python -m ruff check . && .venv/bin/python -m ruff format .`
 
-## Arquitetura
-- `src/taskbot/models.py` — dataclass Task
-- `src/taskbot/store.py` — persistência JSON (variável TASKBOT_FILE)
-- `src/taskbot/cli.py` — comandos Typer
+## Architecture
+- `src/taskbot/models.py` — Task dataclass
+- `src/taskbot/store.py` — JSON persistence (TASKBOT_FILE variable)
+- `src/taskbot/cli.py` — Typer commands
 
-## Regras
-- Funções públicas com type hints e um teste em `tests/`.
-- Não adicionar dependências sem perguntar.
-- Nunca alterar testes existentes para os fazer passar.
+## Rules
+- Public functions with type hints and a test in `tests/`.
+- Do not add dependencies without asking.
+- Never change existing tests to make them pass.

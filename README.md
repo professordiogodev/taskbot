@@ -1,32 +1,32 @@
 # taskbot
 
-Ponto de partida do projeto-fio-condutor do curso **Agentes de Código, Modelos Abertos e Segurança**.
+Starting point of the running project of the course **Coding Agents, Open Models and Security**.
 
-Este repositório começa **quase vazio de propósito**: vais construir o `taskbot` (uma CLI de tarefas em Python) com a ajuda de um agente de código.
+This repository starts **almost empty on purpose**: you will build `taskbot` (a task CLI in Python) with the help of a coding agent.
 
-## Como começar
+## Getting started
 
-1. Clona o repo:
+1. Clone the repo:
    ```bash
    git clone https://github.com/professordiogodev/taskbot.git
    cd taskbot
-   git switch -c meu-taskbot
+   git switch -c my-taskbot
    ```
-2. Abre **[LAB.md](LAB.md)** e segue os passos pela ordem.
+2. Open **[LAB.md](LAB.md)** and follow the steps in order.
 
-## O que vais construir
+## What you will build
 
 ```bash
-taskbot add "estudar agentes"
+taskbot add "study agents"
 taskbot list
 taskbot done 1
 taskbot rm 1
 ```
 
-Com persistência em JSON, testes, ficheiro de contexto para o agente e prioridades.
+With JSON persistence, tests, a context file for the agent, and priorities.
 
-## Requisitos
+## Requirements
 
-`git`, `python3` (3.10+), `node` (20+), [`uv`](https://docs.astral.sh/uv/), e um agente de código: **Claude Code** ou **OpenCode**.
+`git`, `python3` (3.10+), `node` (20+), [`uv`](https://docs.astral.sh/uv/), and a coding agent: **Claude Code** or **OpenCode**.
 
-> Este repo não tem a solução. O objetivo é aprenderes o fluxo: *Explorar → Planear → Implementar → Verificar → Commit*.
+> This repo does not contain the solution. The goal is for you to learn the workflow: *Explore → Plan → Implement → Verify → Commit*.
