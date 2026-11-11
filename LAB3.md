@@ -6,7 +6,9 @@
 
 ## Arranque (já está preparado)
 
-As dependências (`mcp[cli]`, `rank-bm25`) já estão no `pyproject.toml`/`uv.lock`.
+As dependências (`mcp[cli]<2`, `rank-bm25`) já estão no `pyproject.toml`/`uv.lock`: **não corras `uv add`**.
+
+> ⚠️ O `mcp` está fixado em `<2`. A versão 2.x renomeou `FastMCP` e o `from mcp.server.fastmcp import FastMCP` do código deste lab deixa de funcionar.
 
 ```bash
 git clone https://github.com/professordiogodev/taskbot.git && cd taskbot
@@ -77,7 +79,7 @@ Testa com o inspetor (precisa de Node): `uv run mcp dev docs_server.py`
 
 ## Parte C — Ligar ao agente e partilhar (8 min)
 - 🟣 `opencode mcp add docs -- uv run python docs_server.py` → `mcp.servers.docs` em `opencode.json` (acrescenta `"codemode": false`); verifica com `opencode mcp list` e `/mcps`.
-- 🟠 `claude mcp add --scope project docs -- uv run python docs_server.py` → `.mcp.json`; verifica com `claude mcp list` e `/mcp`.
+- 🟠 `claude mcp add --scope project docs -- uv run python docs_server.py` → `.mcp.json`; verifica com `claude mcp list` e `/mcp`. Fica em *Pending approval* até abrires o `claude` e aprovares.
 
 Pergunta: *"Porque é que os IDs das tarefas nunca são reutilizados? Usa a documentação."* O agente chamou a ferramenta e citou a fonte? Pergunta depois algo que **não** está nos docs: inventou? Se sim, melhora a docstring e acrescenta ao `AGENTS.md`:
 
@@ -198,6 +200,13 @@ PR com `docs/`, `docs_server.py`, config MCP, `AGENTS.md` atualizado, `eval_rag.
 | `gh pr comment` dá 403 | Falta `pull-requests: write` |
 | `unknown revision origin/main` | Falta `fetch-depth: 0` |
 | PR de fork sem comentário | Normal: forks não recebem secrets |
+
+## Notas de verificação (testado a 2026-11-11)
+- ✅ Código do servidor e `eval_rag.py` testados com docs de exemplo: `search_docs` responde por stdio e o recall dá 100% nesse conjunto pequeno.
+- ✅ `opencode` 2.2.x: existem `mcp add`, `run --standalone`, `--archived`, `--file`, `--model provider/model`. O pacote npm `@opencode/cli` é o OpenCode 2 (o `opencode-ai` é a versão 1).
+- ✅ `claude mcp add --scope project` escreve `.mcp.json` com `mcpServers.docs`.
+- ⚠️ `opencode mcp add` escreve `mcp.servers.docs` mas **não** acrescenta `"codemode": false`: põe-no à mão. Nos testes, `opencode mcp list` respondeu "No MCP servers configured" mesmo com o `opencode.json` certo, por isso confirma em `/mcps` dentro do OpenCode.
+- ❓ Não testados: o workflow no GitHub, a Action do Claude Code e uma chamada real ao modelo.
 
 ## Reflexão
 - Se este servidor MCP fosse de um desconhecido, o que lerias antes de o instalar?
