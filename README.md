@@ -12,7 +12,7 @@ Este repositório começa **quase vazio de propósito**: vais construir o `taskb
    cd taskbot
    git switch -c meu-taskbot
    ```
-2. Abre **[LAB.md](LAB.md)** (Aula 1) ou **[LAB3.md](LAB3.md)** (Aula 3 — MCP + RAG + CI) e segue os passos pela ordem.
+2. Segue o guião do lab fornecido pelo professor.
 3. Instala as dependências: `uv sync`
 
 ## O que vais construir
