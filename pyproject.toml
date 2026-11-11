@@ -3,7 +3,11 @@ name = "taskbot"
 version = "0.1.0"
 description = "CLI de tarefas"
 requires-python = ">=3.10"
-dependencies = ["typer>=0.12"]
+dependencies = [
+    "mcp[cli]>=2.3.0",
+    "rank-bm25>=0.2.2",
+    "typer>=0.12",
+]
 
 [project.scripts]
 taskbot = "taskbot.cli:app"

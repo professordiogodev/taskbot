@@ -7,3 +7,5 @@ dist/
 *.egg-info/
 .env
 .env.*
+pr.diff
+review.md
