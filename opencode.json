@@ -1,0 +1,15 @@
+{
+  "mcp": {
+    "servers": {
+      "meusdocs": {
+        "type": "local",
+        "command": [
+          "uv",
+          "run",
+          "python",
+          "docs_server.py"
+        ]
+      }
+    }
+  }
+}
