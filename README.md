@@ -2,7 +2,7 @@
 
 Ponto de partida do projeto-fio-condutor do curso **Agentes de Código, Modelos Abertos e Segurança**.
 
-Este repositório começa **quase vazio de propósito**: vais construir o `taskbot` (uma CLI de tarefas em Python) com a ajuda de um agente de código.
+O `taskbot` é uma CLI de tarefas em Python (Typer), construída com a ajuda de um agente de código, com persistência em JSON, prioridades e testes.
 
 ## Como começar
 
@@ -15,19 +15,29 @@ Este repositório começa **quase vazio de propósito**: vais construir o `taskb
 2. Segue o guião do lab fornecido pelo professor.
 3. Instala as dependências: `uv sync`
 
-## O que vais construir
+## Como usar
 
 ```bash
-taskbot add "estudar agentes"
-taskbot list
-taskbot done 1
-taskbot rm 1
+uv sync                      # instala as dependências e o comando `taskbot` na .venv
+source .venv/bin/activate    # ou usa `uv run taskbot ...` sem ativar
+
+taskbot add "estudar agentes" -p high   # prioridade: low/med/high (por defeito: med)
+taskbot list                            # lista as tarefas, high primeiro
+taskbot done 1                          # marca a tarefa 1 como concluída
+taskbot rm 1                            # remove a tarefa 1
+taskbot --help
 ```
 
-Com persistência em JSON, testes, ficheiro de contexto para o agente e prioridades.
+As tarefas são guardadas em `~/.taskbot.json`. Para usar outro ficheiro, define `TASKBOT_FILE`:
+
+```bash
+TASKBOT_FILE=./tarefas.json taskbot list
+```
+
+Testes: `.venv/bin/python -m pytest -q`
 
 ## Requisitos
 
 `git`, `python3` (3.10+), `node` (20+), [`uv`](https://docs.astral.sh/uv/), e um agente de código: **Claude Code** ou **OpenCode**.
 
-> Este repo não tem a solução. O objetivo é aprenderes o fluxo: *Explorar → Planear → Implementar → Verificar → Commit*.
+> O objetivo é aprenderes o fluxo: *Explorar → Planear → Implementar → Verificar → Commit*.
